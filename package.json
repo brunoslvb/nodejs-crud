@@ -1,0 +1,32 @@
+{
+  "name": "crud",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "pretest": "knex migrate:latest",
+    "test": "jest",
+    "posttest": "knex migrate:rollback --all",
+    "start": "node ./src/app.js",
+    "dev": "nodemon ./src/app.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/brunoslvb/nodejs-crud.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/brunoslvb/nodejs-crud/issues"
+  },
+  "homepage": "https://github.com/brunoslvb/nodejs-crud#readme",
+  "dependencies": {
+    "express": "^4.17.1",
+    "knex": "^0.21.12"
+  },
+  "devDependencies": {
+    "jest": "^26.6.3",
+    "nodemon": "^2.0.6",
+    "sqlite3": "^5.0.0"
+  }
+}
