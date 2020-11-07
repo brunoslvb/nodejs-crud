@@ -1,11 +1,12 @@
 const connection = require('../src/database/connection');
+const UserController = require('../src/controllers/UserController');
 
 const table = 'users';
 
 beforeEach((done) => {
 
     connection(table).truncate().then(data => {
-        console.log('Clear');
+        // console.log('Clear');
         done();
     }).catch(err => {
         console.log(err);
@@ -25,9 +26,36 @@ test('Deve cadastrar um usuário na base de dados', (done) => {
         email: 'bruninho@gmail.com'
     };
 
-    const response = connection(table).insert(data).then(data => {
-        console.log(data);
-        expect(data[0]).toBeGreaterThan(0);
+    UserController.insert(data).then(res => {
+        expect(res[0]).toBeGreaterThan(0);
         done();
     });
+
+});
+
+
+test('Deve retornar uma mensagem de erro ao tentar cadastrar um usuário sem e-mail', (done) => {
+
+    const data = {
+        name: 'Bruno'
+    };
+
+    UserController.insert(data).then(res => {
+
+        expect(res).toEqual("ERRO");
+
+        done();
+    });
+
+});
+
+test('Deve retornar uma lista de usuários vazia', (done) => {
+
+    UserController.getAll().then(res => {
+
+        expect(res).toEqual([]);
+
+        done();
+    });
+
 });
