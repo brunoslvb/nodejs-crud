@@ -6,21 +6,61 @@ module.exports = {
 
         if(data.email === undefined){
 
-            return "ERRO";
+            return { message: 'Preencha o campo e-mail' };
 
         }
 
         const response = await connection('users').insert(data);
 
-        return response;
+        return { message: 'Usuário inserido com sucesso' };
 
     },
 
     async getAll(){
 
-        const response = await connection('users').select();
+        const users = await connection('users').select();
 
-        return response;
+        return { users: users };
+    },
+
+    async getById(id){
+
+        const user = await connection('users').select().where('id', id).first();
+
+        if(!user){
+            return { message: 'Usuário não encontrado' };
+        }
+
+        return user;
+
+    },
+
+    async update(id, data){
+
+        const user = await connection('users').select().where('id', id).first();
+
+        if(!user){
+            return { message: 'Usuário não encontrado' };
+        }
+
+        const response = await connection('users').update(data).where('id', id);
+
+        return { message: 'Usuário atualizado com sucesso' };
+
+    },
+
+    async delete(id){
+
+        const user = await connection('users').select().where('id', id).first();
+
+        if(!user){
+            return { message: 'Usuário não encontrado' };
+        }
+
+        const response = await connection('users').delete().where('id', id);
+
+        return { message: 'Usuário deletado com sucesso' };
+
     }
 
 }
