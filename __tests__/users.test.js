@@ -5,153 +5,171 @@ const table = 'users';
 
 beforeEach((done) => {
 
-    connection(table).truncate().then(data => {
-        // console.log('Clear');
-        done();
-    }).catch(err => {
-        console.log(err);
-    });
+  connection(table).truncate().then(data => {
+
+    done();
+
+  }).catch(err => {
+
+    console.log(err);
+
+  });
 
 });
 
 afterAll((done) => {
-    connection.destroy();
-    done();
-});
 
-test('Deve cadastrar um usuário na base de dados', (done) => {
-
-    const data = {
-        name: 'Bruno',
-        email: 'bruninho@gmail.com'
-    };
-
-    UserController.insert(data).then(res => {
-        // expect(res[0]).toBeGreaterThan(0);
-        expect(res).toMatchObject({
-            message: 'Usuário inserido com sucesso'
-        });
-        done();
-    });
+  connection.destroy();
+  done();
 
 });
 
+describe('POST', () => {
 
-test('Deve retornar uma mensagem de erro ao tentar cadastrar um usuário sem e-mail', (done) => {
+  test('Deve cadastrar um usuário na base de dados', (done) => {
 
     const data = {
-        name: 'Bruno'
+      name: 'Bruno',
+      email: 'bruninho@gmail.com'
     };
 
     UserController.insert(data).then(res => {
 
-        expect(res).toMatchObject({
-            message: 'Preencha o campo e-mail'
-        });
+      expect(res).toMatchObject({
+        message: 'Usuário inserido com sucesso'
+      });
+      done();
 
-        done();
     });
 
-});
+  });
 
-test('Deve retornar uma lista de usuários vazia', (done) => {
-
-    UserController.getAll().then(res => {
-
-        expect(res).toMatchObject({
-            users: []
-        });
-
-        done();
-    });
-
-});
-
-test('Deve retornar uma lista de usuários', (done) => {
+  test('Deve retornar uma mensagem de erro ao tentar cadastrar um usuário sem e-mail', (done) => {
 
     const data = {
-        name: 'Bruno',
-        email: 'bruninho@gmail.com'
+      name: 'Bruno'
     };
 
-    connection(table).insert(data).then(res => {
-        console.log('inserido');
+    UserController.insert(data).then(res => {
+
+      expect(res).toMatchObject({
+        message: 'Preencha o campo e-mail'
+      });
+
+      done();
+
     });
 
-    UserController.getAll().then(res => {
-
-        expect(res).toEqual(expect.objectContaining({
-            users: expect.arrayContaining(
-                [
-                    expect.objectContaining({
-
-                        id: expect.any(Number),
-                        name: expect.any(String),
-                        email: expect.any(String),
-                        created_at: expect.any(String)
-                    })
-                ]
-            )}
-        ));
-
-        done();
-    });
+  });
 
 });
 
-test('Deve retornar um objeto com as informações do usuário especificado', (done) => {
+describe('GET', () => {
+
+  test('Deve retornar uma lista de usuários vazia', (done) => {
+
+    UserController.getAll().then(res => {
+
+      expect(res).toMatchObject({
+        users: []
+      });
+
+      done();
+
+    });
+
+  });
+
+  test('Deve retornar uma lista de usuários', async (done) => {
+
+    const data = {
+      name: 'Bruno',
+      email: 'bruninho@gmail.com'
+    };
+
+    await connection(table).insert(data);
+
+    UserController.getAll().then(res => {
+
+      expect(res).toEqual(expect.objectContaining({
+        users: expect.arrayContaining(
+          [
+            expect.objectContaining({
+
+              id: expect.any(Number),
+              name: expect.any(String),
+              email: expect.any(String),
+              created_at: expect.any(String)
+            })
+          ]
+        )
+      }
+      ));
+
+      done();
+
+    });
+
+  });
+
+  test('Deve retornar um objeto com as informações do usuário especificado', async (done) => {
 
     const data = [
-        {
-            name: 'Bruno',
-            email: 'bruninho@gmail.com'
-        },
-        {
-            name: 'Teste',
-            email: 'teste@teste.com'
-        }
-    ];
-
-    connection(table).insert(data).then(res => {
-        console.log('inserido');
-    });
-
-    const id = 1;
-
-    UserController.getById(id).then(res => {
-        expect(res).toEqual(expect.objectContaining({
-            id: 1,
-            name: 'Bruno',
-            email: 'bruninho@gmail.com',
-            created_at: expect.any(String)
-        }));
-
-        done();
-    });
-});
-
-
-test('Deve retornar uma mensagem de usuário não encontrado', (done) => {
-
-    const id = 1;
-
-    UserController.getById(id).then(res => {
-        expect(res).toMatchObject({ message: 'Usuário não encontrado' });
-
-        done();
-    });
-});
-
-test('Deve atualizar informações do usuário', (done) => {
-
-    const data = {
+      {
         name: 'Bruno',
         email: 'bruninho@gmail.com'
-    }
+      },
+      {
+        name: 'Teste',
+        email: 'teste@teste.com'
+      }
+    ];
 
-    connection(table).insert(data).then(res => {
-        console.log('inserido');
+    await connection(table).insert(data);
+
+    const id = 1;
+
+    UserController.getById(id).then(res => {
+
+      expect(res).toEqual(expect.objectContaining({
+        id: 1,
+        name: 'Bruno',
+        email: 'bruninho@gmail.com',
+        created_at: expect.any(String)
+      }));
+
+      done();
+
     });
+
+  });
+
+  test('Deve retornar uma mensagem de usuário não encontrado', (done) => {
+
+    const id = 1;
+
+    UserController.getById(id).then(res => {
+
+      expect(res).toMatchObject({ message: 'Usuário não encontrado' });
+
+      done();
+
+    });
+
+  });
+
+});
+
+describe('PUT', () => {
+
+  test('Deve atualizar informações do usuário', async (done) => {
+
+    const data = {
+      name: 'Bruno',
+      email: 'bruninho@gmail.com'
+    };
+
+    await connection(table).insert(data);
 
     delete data.name;
     data.email = 'bruno.silva@gmail.com';
@@ -159,64 +177,75 @@ test('Deve atualizar informações do usuário', (done) => {
     const id = 1;
 
     UserController.update(id, data).then(res => {
-        expect(res).toMatchObject({
-            message: 'Usuário atualizado com sucesso'
-        });
 
-        done();
+      expect(res).toMatchObject({
+        message: 'Usuário atualizado com sucesso'
+      });
+
+      done();
+
     });
 
-});
+  });
 
-test('Deve retornar uma mensagem de erro ao tentar atualizar um usuário inexistente', (done) => {
+  test('Deve retornar uma mensagem de erro ao tentar atualizar um usuário inexistente', (done) => {
 
     const data = {
-        email: 'bruno.silva@gmail.com'
-    }
+      email: 'bruno.silva@gmail.com'
+    };
 
     const id = 1;
 
     UserController.update(id, data).then(res => {
-        expect(res).toMatchObject({
-            message: 'Usuário não encontrado'
-        });
 
-        done();
+      expect(res).toMatchObject({
+        message: 'Usuário não encontrado'
+      });
+
+      done();
+
     });
+
+  });
 
 });
 
-test('Deve deletar apenas um usuário da base de dados', (done) => {
+describe('DELETE', () => {
+
+  test('Deve deletar apenas um usuário da base de dados', async (done) => {
 
     const data = {
-        name: 'Bruno',
-        email: 'bruninho@gmail.com'
-    }
+      name: 'Bruno',
+      email: 'bruninho@gmail.com'
+    };
 
-    connection(table).insert(data).then(res => {
-        console.log('inserido');
-    });
+    await connection(table).insert(data);
 
     const id = 1;
 
     UserController.delete(id).then(res => {
 
-        expect(res).toMatchObject({
-            message: 'Usuário deletado com sucesso'
-        });
+      expect(res).toMatchObject({
+        message: 'Usuário deletado com sucesso'
+      });
 
-        done();
+      done();
+
     });
 
-});
+  });
 
-test('Deve retornar uma mensagem de erro ao tentar deletar um usuário inexistente', (done) => {
+  test('Deve retornar uma mensagem de erro ao tentar deletar um usuário inexistente', (done) => {
 
     const id = 1;
 
     UserController.delete(id).then(res => {
-        expect(res).toMatchObject({ message: 'Usuário não encontrado' });
-        done();
+
+      expect(res).toMatchObject({ message: 'Usuário não encontrado' });
+      done();
+
     });
+
+  });
 
 });
